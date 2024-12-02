@@ -16,8 +16,11 @@ def main():
         lines = [s.rstrip('\n') for s in f]
 
     arr = [list(map(int, line.split())) for line in lines]
+    print('max len:', max(map(len, arr)))
+
     count = 0
     for row in arr:
+        # Brute force since rows are short.
         for i in range(len(row)):
             tmp = row[:i] + row[i + 1:]
             delta = np.diff(tmp)
