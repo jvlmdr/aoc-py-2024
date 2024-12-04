@@ -22,7 +22,6 @@ def main():
         lines = [s.rstrip('\n') for s in f]
     grid = np.array(list(map(list, lines)))
     m, n = grid.shape
-    shape = np.array([m, n])
     ii, jj = np.meshgrid(np.arange(m), np.arange(n), indexing='ij')
     # shape: (m, n, 2)
     start = np.stack([ii, jj], axis=2)
@@ -30,7 +29,7 @@ def main():
     # shape: (m, n, 8, 4, 2)
     inds = start[:, :, None, None, :] + steps[:, None] * DIRECTIONS[:, None, :]
     inds = np.reshape(inds, (-1, 4, 2))
-    valid = np.all((0 <= inds) & (inds < shape), axis=(1, 2))
+    valid = np.all(inds % np.array([m, n]) == inds, axis=(1, 2))
     inds = inds[valid]
     words = grid[inds[:, :, 0], inds[:, :, 1]]
     match = np.all(words == np.array(list('XMAS')), axis=-1)
