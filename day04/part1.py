@@ -23,14 +23,13 @@ def main():
     grid = np.array(list(map(list, lines)))
     m, n = grid.shape
     shape = np.array([m, n])
-    inds = []
-    for i in range(m):
-        for j in range(n):
-            steps = np.arange(4)
-            # shape: (8, 4, 2)
-            inds_ij = np.array([i, j]) + steps[None, :, None] * DIRECTIONS[:, None, :]
-            inds.append(inds_ij)
-    inds = np.concatenate(inds, axis=0)
+    ii, jj = np.meshgrid(np.arange(m), np.arange(n), indexing='ij')
+    # shape: (m, n, 2)
+    start = np.stack([ii, jj], axis=2)
+    steps = np.arange(4)
+    # shape: (m, n, 8, 4, 2)
+    inds = start[:, :, None, None, :] + steps[:, None] * DIRECTIONS[:, None, :]
+    inds = np.reshape(inds, (-1, 4, 2))
     valid = np.all((0 <= inds) & (inds < shape), axis=(1, 2))
     inds = inds[valid]
     words = grid[inds[:, :, 0], inds[:, :, 1]]
