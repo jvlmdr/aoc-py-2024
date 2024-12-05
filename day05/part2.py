@@ -24,32 +24,22 @@ def main():
     lt_than = collections.defaultdict(set)
     for a, b in pairs:
         lt_than[a].add(b)
-    lt_than = dict(lt_than)
+
+    def compare(a, b):
+        if b in lt_than[a]:
+            return -1
+        elif a in lt_than[b]:
+            return 1
+        return 0
 
     total = 0
     for row in orders:
         assert len(row) == len(set(row))
+        out = sorted(row, key=functools.cmp_to_key(compare))
         m = (len(row) - 1) // 2
-        out = topological_sort(lt_than, row)
         if out != row:
             total += out[m]
     print(total)
-
-
-def topological_sort(lt, xs):
-    xs = list(xs)
-    i = 0
-    while i < len(xs):
-        j = i + 1
-        valid = True
-        while j < len(xs) and valid:
-            if xs[j] in lt and xs[i] in lt[xs[j]]:
-                xs[i], xs[j] = xs[j], xs[i]
-                valid = False
-            j += 1
-        if valid:
-            i += 1
-    return xs
 
 
 if __name__ == '__main__':
