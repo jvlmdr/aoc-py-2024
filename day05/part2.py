@@ -32,9 +32,6 @@ def main():
         m = (len(row) - 1) // 2
         out = topological_sort(lt_than, row)
         if out != row:
-            print(row)
-            print(out)
-            print()
             total += out[m]
     print(total)
 
