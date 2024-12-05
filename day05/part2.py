@@ -21,14 +21,12 @@ def main():
     pairs = [tuple(map(int, s.split('|'))) for s in pair_lines]
     orders = [list(map(int, s.split(','))) for s in order_lines]
 
-    lt_than = collections.defaultdict(set)
-    for a, b in pairs:
-        lt_than[a].add(b)
+    lt_than = set(pairs)
 
     def compare(a, b):
-        if b in lt_than[a]:
+        if (a, b) in lt_than:
             return -1
-        elif a in lt_than[b]:
+        elif (b, a) in lt_than:
             return 1
         return 0
 
