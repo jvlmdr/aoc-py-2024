@@ -19,20 +19,18 @@ def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
     arr = np.array([list(line) for line in lines])
-    (pos_i,), (pos_j,) = np.where(arr == '^')
-    pos = (pos_i, pos_j)
+    pos = np.squeeze(np.where(arr == '^'))
     free = (arr != '#')
     direction = (-1, 0)
     _, _, candidates = traverse(free, pos, direction)
-    candidates.remove(pos)
+    candidates.remove(tuple(pos))
 
     count = 0
-    for x in candidates:
+    for x in tqdm(candidates):
         tmp = np.array(free)
         tmp[x[0], x[1]] = False
         loop, _, _ = traverse(tmp, pos, direction)
         if loop:
-            print(x)
             count += 1
     print(count)
 
@@ -44,12 +42,13 @@ def traverse(free, pos, direction):
     loop = False
     shape = np.array(free.shape)
     while not exit and not loop:
-        if (pos, direction) in visited_state:
+        state = (tuple(pos), direction)
+        if state in visited_state:
             loop = True
-        visited_pos.add(pos)
-        visited_state.add((pos, direction))
-        next_pos = (pos[0] + direction[0], pos[1] + direction[1])
-        if not (np.all(0 <= np.array(next_pos)) and np.all(np.array(next_pos) < shape)):
+        visited_pos.add(tuple(pos))
+        visited_state.add(state)
+        next_pos = pos + direction
+        if not np.all(next_pos % shape == next_pos):
             exit = True
         else:
             if not free[next_pos[0], next_pos[1]]:

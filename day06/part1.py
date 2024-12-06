@@ -19,24 +19,21 @@ def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
     arr = np.array([list(line) for line in lines])
-    (pos_i,), (pos_j,) = np.where(arr == '^')
-    pos = (pos_i, pos_j)
-    pos = np.array(pos)
+    pos = np.squeeze(np.where(arr == '^'))
     shape = np.array(arr.shape)
     free = (arr != '#')
     direction = (-1, 0)
-    visited = np.zeros(arr.shape, dtype=bool)
+    visited = set()
     while True:
-        visited[pos[0], pos[1]] = True
+        visited.add(tuple(pos))
         next_pos = pos + direction
-        if not (np.all(0 <= next_pos) and np.all(next_pos < shape)):
+        if not np.all(next_pos % shape == next_pos):
             break
         if not free[next_pos[0], next_pos[1]]:
             direction = next_dir[direction]
         else:
             pos = next_pos
-        print(visited)
-    print(np.sum(visited))
+    print(len(visited))
 
 
 if __name__ == '__main__':
