@@ -27,15 +27,13 @@ def parse_line(s):
     return int(result), tuple(map(int, xs.split(' ')))
 
 
-def can_reach(output, inputs):
-    if not inputs:
-        return False
-    x, xs = inputs[0], inputs[1:]
+def can_reach(y, xs):
     if not xs:
-        return x == output
-    if output - x >= 0 and can_reach(output - x, xs):
+        return y == 0
+    x, xs = xs[0], xs[1:]
+    if y - x >= 0 and can_reach(y - x, xs):
         return True
-    if output % x == 0 and can_reach(output // x, xs):
+    if y % x == 0 and can_reach(y // x, xs):
         return True
     return False
 
