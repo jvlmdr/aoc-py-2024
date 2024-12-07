@@ -17,7 +17,7 @@ def main():
     lines = list(map(parse_line, lines))
     total = 0
     for y, xs in lines:
-        if can_reach(y, xs[::-1]):
+        if can_reach(y, xs):
             total += y
     print(total)
 
@@ -30,9 +30,11 @@ def parse_line(s):
 def can_reach(y, xs):
     if not xs:
         return y == 0
-    x, xs = xs[0], xs[1:]
+    xs, x = xs[:-1], xs[-1]
+    # y = ... + x ?
     if y - x >= 0 and can_reach(y - x, xs):
         return True
+    # y = ... * x ?
     if y % x == 0 and can_reach(y // x, xs):
         return True
     return False
