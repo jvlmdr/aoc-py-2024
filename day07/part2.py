@@ -14,35 +14,33 @@ from tqdm import tqdm
 def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
-
-    def parse_line(s):
-        result, inputs = s.split(': ')
-        result = int(result)
-        inputs = list(map(int, inputs.split(' ')))
-        return result, inputs
-
     lines = list(map(parse_line, lines))
     total = 0
-    for output, inputs in lines:
-        if can_reach(output, inputs[::-1]):
-            total += output
+    for y, xs in lines:
+        if can_reach(y, xs[::-1]):
+            total += y
     print(total)
 
 
-def can_reach(output, inputs):
-    if not inputs:
-        return False
-    x, xs = inputs[0], inputs[1:]
+def parse_line(s):
+    result, xs = s.split(': ')
+    return int(result), tuple(map(int, xs.split(' ')))
+
+
+def can_reach(y, xs):
     if not xs:
-        return x == output
-    if output - x >= 0 and can_reach(output - x, xs):
+        return False
+    x, xs = xs[0], xs[1:]
+    if not xs:
+        return x == y
+    if y - x >= 0 and can_reach(y - x, xs):
         return True
-    if output % x == 0 and can_reach(output // x, xs):
+    if y % x == 0 and can_reach(y // x, xs):
         return True
-    output_str = str(output)
+    y_str = str(y)
     x_str = str(x)
     n = len(x_str)
-    if len(output_str) > n and output_str[-n:] == x_str and can_reach(int(output_str[:-n]), xs):
+    if len(y_str) > n and y_str[-n:] == x_str and can_reach(int(y_str[:-n]), xs):
         return True
     return False
 

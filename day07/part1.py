@@ -14,19 +14,17 @@ from tqdm import tqdm
 def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
-
-    def parse_line(s):
-        result, inputs = s.split(': ')
-        result = int(result)
-        inputs = list(map(int, inputs.split(' ')))
-        return result, inputs
-
     lines = list(map(parse_line, lines))
     total = 0
-    for output, inputs in lines:
-        if can_reach(output, inputs[::-1]):
-            total += output
+    for y, xs in lines:
+        if can_reach(y, xs[::-1]):
+            total += y
     print(total)
+
+
+def parse_line(s):
+    result, xs = s.split(': ')
+    return int(result), tuple(map(int, xs.split(' ')))
 
 
 def can_reach(output, inputs):
