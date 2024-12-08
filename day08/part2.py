@@ -20,13 +20,10 @@ def main():
     shape = np.array(arr.shape)
     antinodes = set()
     for k in tokens:
-        # shape: (2, n)
-        locs = np.array(np.where(arr == k))
-        _, n = locs.shape
-        for i in range(n):
-            for j in range(i + 1, n):
-                a = locs[:, i]
-                b = locs[:, j]
+        # shape: (n, 2)
+        locs = np.array(np.where(arr == k)).T
+        for i, a in enumerate(locs):
+            for b in locs[i+1:]:
                 c = a
                 while np.all(0 <= c) and np.all(c < shape):
                     antinodes.add(tuple(c))
