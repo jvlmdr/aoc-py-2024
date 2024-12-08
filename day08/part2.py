@@ -25,11 +25,11 @@ def main():
         for i, a in enumerate(locs):
             for b in locs[i+1:]:
                 c = a
-                while np.all(0 <= c) and np.all(c < shape):
+                while np.all(c % shape == c):
                     antinodes.add(tuple(c))
                     c = c + (a - b)
                 c = b
-                while np.all(0 <= c) and np.all(c < shape):
+                while np.all(c % shape == c):
                     antinodes.add(tuple(c))
                     c = c + (b - a)
     print(len(antinodes))
