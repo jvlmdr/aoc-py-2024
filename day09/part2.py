@@ -21,7 +21,6 @@ def main():
     # Try to move each file to the left.
     i = len(disk) - 1
     while i > 0:
-        # Attempt to move each file back to the left.
         pos_i, size_i, index_i = disk[i]
         if index_i is None:
             disk.pop(i)
@@ -35,9 +34,10 @@ def main():
             delta = size_j - size_i
             if delta < 0:
                 continue
-            # Move the object to the position of the space.
+            # Replace the empty space with the object.
             disk.pop(i)
             disk[j] = (pos_j, size_i, index_i)
+            # Insert remaining empty space between this object and the next.
             if delta > 0:
                 disk.insert(j + 1, (pos_j + size_i, delta, None))
                 i += 1
