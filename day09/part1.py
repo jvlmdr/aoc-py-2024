@@ -16,35 +16,33 @@ def main():
         lines = [s.rstrip('\n') for s in f]
     line, = lines
     sizes = list(map(int, line))
-    usage = [-1 for _ in range(sum(sizes))]
-    cursor = 0
+    disk = [None for _ in range(sum(sizes))]
+    pos = 0
     index = 0
     is_file = True
     for size in sizes:
         for _ in range(size):
             if is_file:
-                usage[cursor] = index
-            cursor += 1
+                disk[pos] = index
+            pos += 1
         if is_file:
             index += 1
         is_file = not is_file
 
     a = 0
-    b = len(usage) - 1
+    b = len(disk) - 1
     while a < b:
-        if usage[a] >= 0:
+        if disk[a] is not None:
             a += 1
-        elif usage[b] < 0:
+        elif disk[b] is None:
             b -= 1
         else:
-            assert usage[a] == -1
-            assert usage[b] != -1
-            usage[a] = usage[b]
-            usage[b] = -1
+            disk[a] = disk[b]
+            disk[b] = None
             a += 1
             b -= 1
 
-    print(sum([i * x for i, x in enumerate(usage) if x >= 0]))
+    print(sum([i * x for i, x in enumerate(disk) if x is not None]))
 
 
 if __name__ == '__main__':
