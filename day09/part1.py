@@ -15,20 +15,19 @@ def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
     line, = lines
-    ns = list(map(int, line))
-    usage = [-1 for _ in range(sum(ns))]
+    sizes = list(map(int, line))
+    usage = [-1 for _ in range(sum(sizes))]
     cursor = 0
     index = 0
     is_file = True
-    for n in ns:
-        for _ in range(n):
+    for size in sizes:
+        for _ in range(size):
             if is_file:
                 usage[cursor] = index
             cursor += 1
         if is_file:
             index += 1
         is_file = not is_file
-    print(usage)
 
     a = 0
     b = len(usage) - 1
