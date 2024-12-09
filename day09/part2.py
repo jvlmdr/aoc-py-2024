@@ -16,26 +16,37 @@ def main():
         lines = [s.rstrip('\n') for s in f]
     line, = lines
     sizes = list(map(int, line))
-
     disk = list(parse_sections(sizes))
-    # Walk backwards through the disk.
+
+    # Try to move each file to the left.
     i = len(disk) - 1
     while i > 0:
-        pos_i, size_i, name_i = disk[i]
-        # Walk forwards through the disk.
+        # Attempt to move each file back to the left.
+        pos_i, size_i, index_i = disk[i]
+        if index_i is None:
+            disk.pop(i)
+            i -= 1
+            continue
+        # Look for a free space to the left.
         for j in range(i):
             pos_j, size_j, index_j = disk[j]
-            pos_k, _, _ = disk[j + 1]
-            if pos_j + size_j + size_i <= pos_k:
-                disk.pop(i)
-                disk.insert(j + 1, (pos_j + size_j, size_i, name_i))
+            if index_j is not None:
+                continue
+            delta = size_j - size_i
+            if delta < 0:
+                continue
+            # Move the object to the position of the space.
+            disk.pop(i)
+            disk[j] = (pos_j, size_i, index_i)
+            if delta > 0:
+                disk.insert(j + 1, (pos_j + size_i, delta, None))
                 i += 1
-                break
-            j += 1
+            break
         i -= 1
 
     print(sum([
         index * sum(range(pos, pos + size)) for pos, size, index in disk
+        if index is not None
     ]))
 
 
@@ -44,8 +55,8 @@ def parse_sections(sizes):
     index = 0
     is_file = True
     for size in sizes:
+        yield (pos, size, index if is_file else None)
         if is_file:
-            yield (pos, size, index)
             index += 1
         pos += size
         is_file = not is_file
