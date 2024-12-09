@@ -8,7 +8,6 @@ import re
 import sys
 
 import numpy as np
-from sortedcontainers import SortedDict
 from tqdm import tqdm
 
 
@@ -18,32 +17,25 @@ def main():
     line, = lines
     sizes = list(map(int, line))
 
-    init_disk = list(parse_sections(sizes))
-    curr_disk = SortedDict({pos: (size, index) for pos, size, index in init_disk})
-    # Walk backwards through the objects.
-    for pos, size, index in reversed(init_disk):
-        if index is None:
-            continue
-        assert pos in curr_disk
-        for pos_, (size_, index_) in curr_disk.items():
-            if pos_ >= pos:
+    disk = list(parse_sections(sizes))
+    # Walk backwards through the disk.
+    i = len(disk) - 1
+    while i > 0:
+        pos_i, size_i, name_i = disk[i]
+        # Walk forwards through the disk.
+        for j in range(i):
+            pos_j, size_j, index_j = disk[j]
+            pos_k, _, _ = disk[j + 1]
+            if pos_j + size_j + size_i <= pos_k:
+                disk.pop(i)
+                disk.insert(j + 1, (pos_j + size_j, size_i, name_i))
+                i += 1
                 break
-            if index_ is not None:
-                continue
-            leftover = size_ - size
-            if leftover < 0:
-                continue
-            # We've found our spot!
-            del curr_disk[pos]
-            curr_disk[pos_] = (size, index)
-            if leftover > 0:
-                curr_disk[pos_ + size] = (leftover, None)
-            break
+            j += 1
+        i -= 1
 
     print(sum([
-        index * sum(range(pos, pos + size))
-        for pos, (size, index) in curr_disk.items()
-        if index is not None
+        index * sum(range(pos, pos + size)) for pos, size, index in disk
     ]))
 
 
@@ -52,10 +44,10 @@ def parse_sections(sizes):
     index = 0
     is_file = True
     for size in sizes:
-        yield (pos, size, index if is_file else None)
-        pos += size
         if is_file:
+            yield (pos, size, index)
             index += 1
+        pos += size
         is_file = not is_file
 
 
