@@ -15,8 +15,6 @@ def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
 
-    pass
-
 
 if __name__ == '__main__':
     main()
