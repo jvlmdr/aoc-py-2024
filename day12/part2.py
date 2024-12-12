@@ -29,11 +29,7 @@ def main():
 
 def find_sides(mask):
     mask = np.pad(mask, ((1, 1), (1, 1)))
-    fence0 = np.diff(mask, axis=0)
-    fence1 = np.diff(mask, axis=1)
-    start0 = np.diff(fence0, axis=1)
-    start1 = np.diff(fence1, axis=0)
-    return np.sum(np.maximum(0, start0)) + np.sum(np.maximum(0, start1))
+    return np.abs(np.diff(np.diff(mask, axis=0), axis=1)).sum()
 
 
 def find_groups(arr):

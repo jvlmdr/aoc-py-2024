@@ -29,7 +29,7 @@ def main():
 
 def find_perim(mask):
     mask = np.pad(mask, ((1, 1), (1, 1)))
-    return np.sum(np.diff(mask, axis=1) != 0) + np.sum(np.diff(mask, axis=0) != 0)
+    return np.sum(np.abs(np.diff(mask, axis=1))) + np.sum(np.abs(np.diff(mask, axis=0)))
 
 
 def find_groups(arr):
