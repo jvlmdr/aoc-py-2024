@@ -15,7 +15,24 @@ def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
     arr = np.array(list(map(list, lines)))
+    group = find_groups(arr)
+    group_ids = set(group.flatten())
+    total = 0
+    for group_id in group_ids:
+        mask = np.astype(group == group_id, int)
+        area = np.sum(mask)
+        perim = find_perim(mask)
+        print(area, perim)
+        total += area * perim
+    print(total)
 
+
+def find_perim(mask):
+    mask = np.pad(mask, ((1, 1), (1, 1)))
+    return np.sum(np.diff(mask, axis=1) != 0) + np.sum(np.diff(mask, axis=0) != 0)
+
+
+def find_groups(arr):
     group = np.zeros_like(arr, dtype=int)
 
     def walk(pos, num):
@@ -36,20 +53,7 @@ def main():
                 walk((i, j), counter)
                 counter += 1
 
-    group_ids = set(group.flatten())
-    total = 0
-    for group_id in group_ids:
-        mask = group == group_id
-        area = np.sum(mask)
-        perim = calcPerim(mask)
-        print(area, perim)
-        total += area * perim
-    print(total)
-
-
-def calcPerim(mask):
-    mask = np.pad(mask, ((1, 1), (1, 1)), 'constant', constant_values=0)
-    return np.sum(np.diff(mask, axis=1) != 0) + np.sum(np.diff(mask, axis=0) != 0)
+    return group
 
 
 if __name__ == '__main__':

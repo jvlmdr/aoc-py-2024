@@ -15,7 +15,28 @@ def main():
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
     arr = np.array(list(map(list, lines)))
+    group = find_groups(arr)
+    group_ids = set(group.flatten())
+    total = 0
+    for group_id in group_ids:
+        mask = np.astype(group == group_id, int)
+        area = np.sum(mask)
+        sides = find_sides(mask)
+        print(area, sides)
+        total += area * sides
+    print(total)
 
+
+def find_sides(mask):
+    mask = np.pad(mask, ((1, 1), (1, 1)))
+    fence0 = np.diff(mask, axis=0)
+    fence1 = np.diff(mask, axis=1)
+    start0 = np.diff(fence0, axis=1)
+    start1 = np.diff(fence1, axis=0)
+    return np.sum(np.maximum(0, start0)) + np.sum(np.maximum(0, start1))
+
+
+def find_groups(arr):
     group = np.zeros_like(arr, dtype=int)
 
     def walk(pos, num):
@@ -36,26 +57,7 @@ def main():
                 walk((i, j), counter)
                 counter += 1
 
-    group_ids = set(group.flatten())
-    total = 0
-    for group_id in group_ids:
-        mask = group == group_id
-        area = np.sum(mask)
-        perim = calcSides(mask)
-        print(area, perim)
-        total += area * perim
-    print(total)
-
-
-def calcSides(mask):
-    mask = np.pad(mask, ((1, 1), (1, 1)), 'constant', constant_values=0)
-    mask = np.astype(mask, int)
-    fence0 = np.diff(mask, axis=0)
-    fence1 = np.diff(mask, axis=1)
-    # Now need to count number of straight lines in fence.
-    start0 = np.diff(fence0, axis=1)
-    start1 = np.diff(fence1, axis=0)
-    return np.sum(np.maximum(0, start0)) + np.sum(np.maximum(0, start1))
+    return group
 
 
 if __name__ == '__main__':
