@@ -18,8 +18,7 @@ def main():
     games = list(map(parse_game, game_lines))
 
     results = []
-    for game in games:
-        (a1, a2), (b1, b2), (g1, g2) = game
+    for (a1, a2), (b1, b2), (g1, g2) in games:
         # u * a1 + v * b1 = g1
         # u * a2 + v * b2 = g2
         # solution:
