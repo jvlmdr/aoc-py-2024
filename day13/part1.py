@@ -18,20 +18,18 @@ def main():
     games = list(map(parse_game, game_lines))
 
     results = []
-    for (ai, aj), (bi, bj), (gi, gj) in games:
-        wins = []
-        for u in range(101):
-            (pi, pj) = (u * ai, u * aj)
-            v = (gi - pi) // bi
-            if not 0 <= v <= 100:
-                continue
-            if (gi, gj) == (pi + v * bi, pj + v * bj):
-                wins.append(3 * u + v)
-        if wins:
-            results.append(min(wins))
+    for game in games:
+        (a1, a2), (b1, b2), (g1, g2) = game
+        # u * a1 + v * b1 = g1
+        # u * a2 + v * b2 = g2
+        # solution:
+        # v = (a1 * g2 - a2 * g1) / (a1 * b2 - a2 * b1)
+        # u = (g1 - b1 * v) / a1
+        v = (a1 * g2 - a2 * g1) // (a1 * b2 - a2 * b1)
+        u = (g1 - b1 * v) // a1
+        if a1 * u + b1 * v == g1 and a2 * u + b2 * v == g2:
+            results.append(3 * u + v)
 
-    print('feasible:', len(results), 'of', len(games))
-    print(results)
     print(sum(results))
 
 

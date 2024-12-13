@@ -19,23 +19,17 @@ def main():
 
     results = []
     for game in games:
-        (ai, aj), (bi, bj), (gi, gj) = game
-        # Need:
-        # u * ai + v * bi = gi
-        # u * aj + v * bj = gj
-        # There may be many such solutions?
-        (_, s, _) = np.linalg.svd([[ai, bi], [aj, bj]])
-        if abs(s[1]) < 1e-6:
-            raise ValueError('ambiguous')
-        (u, v) = np.linalg.solve([[ai, bi], [aj, bj]], [gi, gj])
-        u, v = int(round(u)), int(round(v))
-        if u < 0 or v < 0:
-            continue
-        if ai * u + bi * v == gi and aj * u + bj * v == gj:
+        (a1, a2), (b1, b2), (g1, g2) = game
+        # u * a1 + v * b1 = g1
+        # u * a2 + v * b2 = g2
+        # solution:
+        # v = (a1 * g2 - a2 * g1) / (a1 * b2 - a2 * b1)
+        # u = (g1 - b1 * v) / a1
+        v = (a1 * g2 - a2 * g1) // (a1 * b2 - a2 * b1)
+        u = (g1 - b1 * v) // a1
+        if a1 * u + b1 * v == g1 and a2 * u + b2 * v == g2:
             results.append(3 * u + v)
 
-    print('feasible:', len(results), 'of', len(games))
-    print(results)
     print(sum(results))
 
 
