@@ -17,15 +17,14 @@ def main():
     robots = [parse_line(s) for s in lines]
 
     nx, ny = 101, 103
-    for t in range(100):
+    for _ in range(100):
         robots = [
-            (((px + vx) % nx, (py + vy) % ny), (vx, vy)) for (px, py), (vx, vy) in robots
+            (((px + vx) % nx, (py + vy) % ny), (vx, vy))
+            for (px, py), (vx, vy) in robots
         ]
-        pprint(robots)
 
     # Count number in each quadrant.
     mx, my = nx // 2, ny // 2
-    print(mx, my)
     quadrants = [0, 0, 0, 0]
     for (px, py), _ in robots:
         if px == mx or py == my:
