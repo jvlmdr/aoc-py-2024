@@ -10,12 +10,8 @@ import sys
 import numpy as np
 from tqdm import tqdm
 
-DIRECTIONS = {
-    '^': (-1, 0),
-    'v': (1, 0),
-    '<': (0, -1),
-    '>': (0, 1),
-}
+DIRECTIONS = {'^': (-1, 0), 'v': (1, 0), '<': (0, -1), '>': (0, 1)}
+
 
 def main():
     with open(sys.argv[1]) as f:
@@ -38,18 +34,6 @@ def main():
         pos, is_box, _ = attempt_move(is_wall, pos, is_box, direction)
 
     print(checksum(is_box))
-
-
-def render(is_wall, is_box, pos):
-    m, n = is_wall.shape
-    lines = [
-        ["O" if is_box[i, j] else "#" if is_wall[i, j] else " "
-            for j in range(n)]
-        for i in range(m)
-    ]
-    if pos is not None:
-        lines[pos[0]][pos[1]] = "@"
-    return "\n".join("".join(line) for line in lines)
 
 
 def attempt_move(is_wall, pos, is_box, direction):
@@ -84,6 +68,18 @@ def checksum(is_box):
     m, n = is_box.shape
     i, j = np.meshgrid(np.arange(m), np.arange(n), indexing='ij')
     return np.sum((100 * i + j) * np.astype(is_box, int))
+
+
+def render(is_wall, is_box, pos):
+    m, n = is_wall.shape
+    lines = [
+        ["O" if is_box[i, j] else "#" if is_wall[i, j] else " "
+            for j in range(n)]
+        for i in range(m)
+    ]
+    if pos is not None:
+        lines[pos[0]][pos[1]] = "@"
+    return "\n".join("".join(line) for line in lines)
 
 
 if __name__ == '__main__':

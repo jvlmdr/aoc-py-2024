@@ -17,19 +17,18 @@ def main():
     arr = np.array(list(map(list, lines)))
     group = find_groups(arr)
     group_ids = set(group.flatten())
+
     total = 0
     for group_id in group_ids:
         mask = np.astype(group == group_id, int)
         area = np.sum(mask)
         sides = find_sides(mask)
-        print(area, sides)
         total += area * sides
     print(total)
 
-
 def find_sides(mask):
     mask = np.pad(mask, ((1, 1), (1, 1)))
-    return np.abs(np.diff(np.diff(mask, axis=0), axis=1)).sum()
+    return np.sum(np.abs(np.diff(np.diff(mask, axis=0), axis=1)))
 
 
 def find_groups(arr):
