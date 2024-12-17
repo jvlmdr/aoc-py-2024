@@ -18,18 +18,15 @@ def main():
     program_line = lines[4]
     registers = tuple([int(s.split(': ')[1]) for s in register_lines])
     instructions = list(map(int, program_line.split(': ')[1].split(',')))
-    outputs = execute(instructions, registers)
-    print(','.join(map(str, outputs)))
+    print(','.join(map(str, execute(instructions, registers))))
 
 
 def execute(instructions, registers):
     counter = 0
-    outputs = []
     while 0 <= counter < len(instructions):
         registers, counter, out = step(instructions, registers, counter)
         if out is not None:
-            outputs.append(out)
-    return outputs
+            yield out
 
 
 def step(instructions, registers, counter):
