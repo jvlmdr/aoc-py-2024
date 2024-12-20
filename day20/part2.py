@@ -10,69 +10,64 @@ import sys
 import numpy as np
 from tqdm import tqdm
 
+DIRECTIONS = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
 
 def main():
+    min_gain = int(sys.argv[2])
+    max_dist = int(sys.argv[3])
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
     arr = np.array([list(s) for s in lines])
-    is_open = arr != '#'
-    start = tuple(map(int, np.squeeze(np.asarray(np.where(arr == 'S')))))
-    end = tuple(map(int, np.squeeze(np.asarray(np.where(arr == 'E')))))
-    dist = compute_distances(is_open, start, end)
+    bounds = arr.shape
+    path = set(map(tuple, np.array(np.where(arr != '#')).T.tolist()))
+    end, = map(tuple, np.array(np.where(arr == 'E')).T.tolist())
+    dist = compute_distances(path, end)
 
-    path_i, path_j = np.where(is_open)
-    path_i = list(map(int, path_i))
-    path_j = list(map(int, path_j))
     shortcuts = {}
-    for i, j in tqdm(list(zip(path_i, path_j))):
-        for gain, a, b in find_shortcuts_from(dist, (i, j), 20):
-            if not gain >= 100:
+    for a in tqdm(dist.keys()):
+        for b, gain in find_shortcuts_from(bounds, dist, a, max_dist):
+            if not gain >= min_gain:
                 continue
-            shortcuts[(a, b)] = max(shortcuts.get((a, b), 0), gain)
-    print(len(shortcuts.values()))
+            shortcuts[a, b] = max(shortcuts.get((a, b), 0), gain)
+    print(len(shortcuts))
 
 
-def find_shortcuts_from(dist, start, max_depth):
-    assert np.isfinite(dist[start])
-    shape = dist.shape
-    q = [(0, start)]
+def compute_distances(path, goal):
+    dist = {}
+    pos, prev = goal, None
+    for i in itertools.count():
+        dist[pos] = i
+        neighbors = [
+            x for x in [(pos[0] + d[0], pos[1] + d[1]) for d in DIRECTIONS]
+            if x in path and x != prev
+        ]
+        if len(neighbors) == 0:
+            break
+        prev = pos
+        pos, = neighbors
+    return dist
+
+
+def find_shortcuts_from(bounds, dist, start, max_depth):
+    q = collections.deque([(start, 0)])
     visited = set()
     while q:
-        depth, pos = heapq.heappop(q)
+        pos, depth = q.popleft()
         if pos in visited:
             continue
         visited.add(pos)
-        assert depth <= max_depth
-        if np.isfinite(dist[pos]):
+        if pos in dist:
             gain = dist[pos] - dist[start] - depth
             if gain > 0:
-                yield (int(gain), start, pos)
-        if depth == max_depth:
+                yield (pos, int(gain))
+        if not depth < max_depth:
             continue
-        for d in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+        for d in DIRECTIONS:
             new_pos = (pos[0] + d[0], pos[1] + d[1])
-            if not (0 <= new_pos[0] < shape[0] and 0 <= new_pos[1] < shape[1]):
+            if not (0 <= new_pos[0] < bounds[0] and 0 <= new_pos[1] < bounds[1]):
                 continue
-            heapq.heappush(q, (depth + 1, new_pos))
-
-
-def compute_distances(is_open, start, end):
-    dist = np.full(is_open.shape, np.inf)
-    q = [(0, end)]
-    visited = set()
-    while q:
-        path_len, pos = heapq.heappop(q)
-        visited.add(pos)
-        assert dist[pos] == np.inf, dist[pos]
-        dist[pos] = path_len
-        for d in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-            new_pos = (pos[0] + d[0], pos[1] + d[1])
-            if new_pos in visited:
-                continue
-            if is_open[new_pos]:
-                heapq.heappush(q, (path_len + 1, new_pos))
-    return dist
-
+            q.append((new_pos, depth + 1))
 
 
 if __name__ == '__main__':
