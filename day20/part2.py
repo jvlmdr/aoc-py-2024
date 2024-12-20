@@ -15,22 +15,26 @@ DIRECTIONS = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
 def main():
     min_gain = int(sys.argv[2])
-    max_dist = int(sys.argv[3])
+    max_len = int(sys.argv[3])
     with open(sys.argv[1]) as f:
         lines = [s.rstrip('\n') for s in f]
     arr = np.array([list(s) for s in lines])
-    bounds = arr.shape
     path = set(map(tuple, np.array(np.where(arr != '#')).T.tolist()))
     end, = map(tuple, np.array(np.where(arr == 'E')).T.tolist())
     dist = compute_distances(path, end)
 
-    shortcuts = {}
-    for a in tqdm(dist.keys()):
-        for b, gain in find_shortcuts_from(bounds, dist, a, max_dist):
-            if not gain >= min_gain:
+    count = 0
+    for a, dist_a in tqdm(dist.items()):
+        for b, dist_b in dist.items():
+            if not dist_a > dist_b:
                 continue
-            shortcuts[a, b] = max(shortcuts.get((a, b), 0), gain)
-    print(len(shortcuts))
+            shortcut_len = abs(a[0] - b[0]) + abs(a[1] - b[1])
+            if not shortcut_len <= max_len:
+                continue
+            gain = dist_a - (dist_b + shortcut_len)
+            if gain >= min_gain:
+                count += 1
+    print(count)
 
 
 def compute_distances(path, goal):
@@ -47,27 +51,6 @@ def compute_distances(path, goal):
         prev = pos
         pos, = neighbors
     return dist
-
-
-def find_shortcuts_from(bounds, dist, start, max_depth):
-    q = collections.deque([(start, 0)])
-    visited = set()
-    while q:
-        pos, depth = q.popleft()
-        if pos in visited:
-            continue
-        visited.add(pos)
-        if pos in dist:
-            gain = dist[pos] - dist[start] - depth
-            if gain > 0:
-                yield (pos, int(gain))
-        if not depth < max_depth:
-            continue
-        for d in DIRECTIONS:
-            new_pos = (pos[0] + d[0], pos[1] + d[1])
-            if not (0 <= new_pos[0] < bounds[0] and 0 <= new_pos[1] < bounds[1]):
-                continue
-            q.append((new_pos, depth + 1))
 
 
 if __name__ == '__main__':
