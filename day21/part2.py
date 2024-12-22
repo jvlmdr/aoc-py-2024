@@ -45,21 +45,20 @@ def main():
 
 def paths_between(avoid, a, b):
     if a == avoid or b == avoid:
-        return []
+        return
     if a == b:
-        return ['']
+        yield ''
+        return
     ai, aj = a
     bi, bj = b
     sign = lambda x: -1 if x < 0 else 1 if x > 0 else 0
     di = sign(bi - ai)
     dj = sign(bj - aj)
 
-    results = []
     if abs(di):
-        results.extend(('^' if di < 0 else 'v') + x for x in paths_between(avoid, (ai + di, aj), b))
+        yield from (('^' if di < 0 else 'v') + x for x in paths_between(avoid, (ai + di, aj), b))
     if abs(dj):
-        results.extend(('<' if dj < 0 else '>') + x for x in paths_between(avoid, (ai, aj + dj), b))
-    return results
+        yield from (('<' if dj < 0 else '>') + x for x in paths_between(avoid, (ai, aj + dj), b))
 
 
 if __name__ == '__main__':
