@@ -32,7 +32,11 @@ def main():
         if level == 0:
             return 1
         avoid = (3, 0) if level == num_levels else (0, 0)
-        candidates = [x + 'A' for x in paths_between(avoid, a, b)]
+        # Exclude paths that contain multiple changes in direction.
+        candidates = [
+            x + 'A' for x in paths_between(avoid, a, b)
+            if sum(1 for _ in itertools.groupby(x)) <= 2
+        ]
         best_cost, _ = min((min_seq_cost(level - 1, x), x) for x in candidates)
         return best_cost
 
